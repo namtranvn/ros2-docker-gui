@@ -1,0 +1,44 @@
+stages:   
+  - build
+  - deploy
+
+build_image:
+  stage: build
+  tags: 
+    - ubuntu-stc-03
+  before_script:
+    - docker login -u -p 
+  script:
+    - docker build . --file Dockerfile --tag ros2-gui:v1
+
+push_image:
+  stage: build
+  tags:
+    - ubuntu-stc-03
+  needs:
+    - build_image
+  script:
+    - docker tag ros2-gui:v1 hoainamtran204/ros2-gui:v1
+    - docker push hoainamtran204/ros2-gui:v1
+
+deploy_job:
+  stage: deploy
+  tags: 
+    - ubuntu-stc-03
+  needs:
+    - push_image
+  script:
+    - docker pull hoainamtran204/ros2-gui:v1
+    - docker compose up -d
+
+# run_job:
+#   stage: deploy
+#   tags: 
+#     - ubuntu-stc-03
+#   needs:
+#     - deploy_job
+#   script:
+      # - docker exec -d ros2-gazebo-tugbot bash -c 'source /opt/ros/humble/setup.bash; ign gazebo tugbot_depot.sdf'
+      # - docker exec -d ros2-gazebo-tugbot bash -c 'source /opt/ros/humble/setup.bash; ros2 run ros_ign_bridge parameter_bridge /model/tugbot/cmd_vel@geometry_msgs/msg/Twist@ignition.msgs.Twist'
+      # - docker exec -d ros2-gazebo-tugbot bash -c 'ros2 run ros_ign_bridge parameter_bridge /world/world_demo/model/tugbot/link/camera_front/sensor/color/image@sensor_msgs/msg/Image@ignition.msgs.Image'
+      # - docker exec -d ros2-gazebo-tugbot bash -c 'ros2 run rqt_image_view rqt_image_view'

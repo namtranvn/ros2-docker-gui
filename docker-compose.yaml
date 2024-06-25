@@ -1,0 +1,15 @@
+# version: "3"
+services:
+  ros2:
+    container_name: ros2-humble-desktop
+    image: hoainamtran204/ros2-desktop:v1
+    build:
+      context: .
+    environment:
+      - DISPLAY=$DISPLAY
+      - QT_X11_NO_MITSHM=1 
+    volumes:
+       - /tmp/.X11-unix:/tmp/.X11-unix
+       - $HOME/.Xauthority/:/root/.Xauthority
+       - /home/namtran/Desktop/doing/ros2-docker-gui:/app
+    tty: true
